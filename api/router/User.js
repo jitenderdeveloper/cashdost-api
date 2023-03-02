@@ -24,7 +24,7 @@ const sendVerifyMail = async (username, email, userId) =>{
       from:'davidstark0741@gmail.com',
       to:email,
       subject:'For Verify E-mail',
-      html:'<p>Hii '+ username +', please click here to <a href=" http://localhost:3000/EmailVerify?id='+userId+' "> Verify </a> your mail</p>'
+      html:'<p>Hii '+ username +', please click here to <a href=" http://localhost:3000/Verify?id='+userId+' "> Verify </a> your mail</p>'
     }
     // console.log("mail data -->",mailOption);
 
@@ -202,12 +202,12 @@ router.delete("/update", async (req, res) => {
 });
 
 
-router.get('/EmailVerify', async (req, res) =>{
+router.get('/Verify', async (req, res) =>{
   try {
     const verify_data = await UserData.updateOne({_id:req.query.id}, { $set:{ isVerify: true}});
     console.log("your email verify data --->",req.query.id);
 
-    res.render('/EmailVerify')
+    res.render('/Verify')
 
   } catch (error) {
     res.status(400).json({
