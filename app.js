@@ -38,11 +38,11 @@ app.use(cors())
 //router connection----
 app.use('/public',express.static('public'));
 
-app.use('/cashdost/api/user', UsersRouter)
-app.use('/cashdost/api/product', ProductRouter)
-app.use('/cashdost/api/category', CategoryRouter)
-app.use('/cashdost/api/client', ClientRouter)
-app.use('/cashdost/api/offer', OfferRouter)
+app.use('/api/user', UsersRouter)
+app.use('/api/product', ProductRouter)
+app.use('/api/category', CategoryRouter)
+app.use('/api/client', ClientRouter)
+app.use('/api/offer', OfferRouter)
 
 
 

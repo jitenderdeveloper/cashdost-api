@@ -3,7 +3,46 @@ const router = express.Router();
 const UserData = require("../modules/UserSchema");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const jwtSecret ="4715aed3c946f7b0f74f472fdd9j9j7h7h7jy804700770d572af3dce43625dd";
+const jwtSecret =
+  "4715aed3c946f7b0f74f472fdd9j9j7h7h7jy804700770d572af3dce43625dd";
+const VerifyMalier = require('nodemailer')
+
+
+const sendVerifyMail = async (username, email, userId) =>{
+  try {
+    const transporter = VerifyMalier.createTransport({
+      host:'smtp.gmail.com',
+      port:25,
+      secure:false,
+      requireTLS:false,
+      auth:{
+        user:'davidstark0741@gmail.com',
+        pass:'chrpimqkxgocegkg'
+      }
+    })
+    const mailOption = {
+      from:'davidstark0741@gmail.com',
+      to:email,
+      subject:'For Verify E-mail',
+      html:'<p>Hii '+ username +', please click here to <a href=" http://localhost:3000/EmailVerify?id='+userId+' "> Verify </a> your mail</p>'
+    }
+    // console.log("mail data -->",mailOption);
+
+    transporter.sendMail(mailOption, function(error, info){
+      if (error) {
+        console.log('send mailer error ---->',error);
+      } else {
+        console.log("email is send", info.response);
+      }
+    })
+  } catch (error) {
+    res.status(400).json({
+      message: "nodemailer not working...",
+      register_data: result,
+    });
+  }
+}
+
 
 router.get("/register", (req, res) => {
   try {
@@ -21,7 +60,7 @@ router.get("/register", (req, res) => {
 });
 
 router.post("/register", (req, res) => {
-  const { username, email, phone, password, role } = req.body;
+  const { username, email, phone, password, role, isVerify } = req.body;
   if (password.length < 6) {
     return res.status(400).json({ message: "Password less than 6 characters" });
   }
@@ -33,6 +72,7 @@ router.post("/register", (req, res) => {
         phone: phone,
         password: hash,
         role: role,
+        isVerify: isVerify
       })
         .then((user) => {
           const maxAge = 3 * 60 * 60;
@@ -43,25 +83,27 @@ router.post("/register", (req, res) => {
               expiresIn: maxAge, // 3hrs in sec
             }
           );
-          res.cookie("jwt", token, {
-            httpOnly: true,
-            maxAge: maxAge * 1000, // 3hrs in ms
-          });
           res.status(201).json({
-            message: "User successfully created",
-            user: user,
+            message: "User successfully created. Please verify your mail.",
+            user: {
+              username: username,
+              role: role,
+              token: token,
+            },
           });
+          
+          sendVerifyMail(req.body.username, req.body.email, user._id)
         })
         .catch((error) => {
           res.status(400).json({
-            message: "User not successful created",
+            message: "User are already exits please login",
             error: error.message,
           });
         });
     });
   } catch (err) {
     res.status(401).json({
-      message: "User not successful created",
+      message: "User not successful created Please try again.",
       error: err.mesage,
     });
   }
@@ -71,14 +113,14 @@ router.post("/login", async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
     return res.status(400).json({
-      message: "Username or Password not present",
+      message: "Username or Password not Present",
     });
   }
   try {
     const user = await UserData.findOne({ username });
     if (!user) {
       res.status(400).json({
-        message: "Login not successful",
+        message: "User not Exits",
         error: "User not found",
       });
     } else {
@@ -98,7 +140,7 @@ router.post("/login", async (req, res) => {
             token: token,
           });
         } else {
-          res.status(400).json({ message: "Login not succesful" });
+          res.status(400).json({ message: "User not found" });
         }
       });
     }
@@ -158,5 +200,21 @@ router.delete("/update", async (req, res) => {
         .json({ message: "An error occurred", error: error.message })
     );
 });
+
+
+router.get('/EmailVerify', async (req, res) =>{
+  try {
+    const verify_data = await UserData.updateOne({_id:req.query.id}, { $set:{ isVerify: true}});
+    console.log("your email verify data --->",req.query.id);
+
+    res.render('/EmailVerify')
+
+  } catch (error) {
+    res.status(400).json({
+      message: "Verify is wrong...",
+      error: error.message,
+    });
+  }
+})
 
 module.exports = router;
