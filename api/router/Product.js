@@ -100,7 +100,8 @@ router.put("/:id", upload.single("file"), (req, res) => {
           link: req.body.link,
         },
       }
-    ).then((result) => {
+    )
+    .then((result) => {
       res.status(200).json({
         message: "All product data...",
         product_data: result,
