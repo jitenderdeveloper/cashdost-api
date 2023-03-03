@@ -38,7 +38,8 @@ app.use(bodyParser.json())
 app.use(cors())
 
 //router connection----
-app.use('/public',express.static('public'));
+// app.use('/public',express.static('public'));
+app.use(express.static(__dirname + "/public/"));
 
 app.use('/api/user', UsersRouter)
 app.use('/api/product', ProductRouter)
