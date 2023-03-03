@@ -202,6 +202,8 @@ router.delete("/update", async (req, res) => {
 });
 
 
+
+
 router.get('/Verify', async (req, res) =>{
   try {
     const verify_data = await UserData.updateOne({_id:req.query.id}, { $set:{ isVerify: true}});
@@ -216,5 +218,7 @@ router.get('/Verify', async (req, res) =>{
     });
   }
 })
+
+
 
 module.exports = router;

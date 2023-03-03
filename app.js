@@ -9,6 +9,8 @@ const ProductRouter = require('./api/router/Product')
 const CategoryRouter = require('./api/router/Category')
 const ClientRouter = require('./api/router/Clients')
 const OfferRouter = require('./api/router/Offers')
+const CouponRouter = require('./api/router/Coupons')
+const TodayDealsRouter = require('./api/router/TodayDeals')
 
 // --mongoose-connection----
 const mongoose = require('mongoose');
@@ -43,6 +45,8 @@ app.use('/api/product', ProductRouter)
 app.use('/api/category', CategoryRouter)
 app.use('/api/client', ClientRouter)
 app.use('/api/offer', OfferRouter)
+app.use('/api/coupon', CouponRouter)
+app.use('/api/todaydeals', TodayDealsRouter)
 
 
 

@@ -1,52 +1,132 @@
-const express = require('express')
-const router = express.Router()
-const Product = require('../modules/ProductSchema')
-const authorization = require('../middleware/auth')
+const express = require("express");
+const router = express.Router();
+const Product = require("../modules/ProductSchema");
+const authorization = require("../middleware/auth");
+const fs = require("fs");
 
-router.get('/',authorization.adminAuth, (req, res) =>{
-    try {
-        Product.find()
-        .populate('category_id')
-        .populate('offer_id')
-        .populate('client_id')
-        .then((result) =>{  
-            res.status(200).json({
-                message: 'All product data...',
-                product_data: result
-            })
-        })
-    } catch (error) {
-        res.status(400).json({
-            message: error.message,
-        })
-    }
-})
+// ---multar-section---
 
-router.post('/', (req, res) =>{
-    try {
-        const product_data = Product({
-            category_id:req.body.category_id,
-            offer_id:req.body.offer_id,
-            client_id:req.body.client_id,
-            title:req.body.title,
-            image:req.body.image,
-            description:req.body.description,
-            link:req.body.link
-        })
-        product_data.save()
-        .then((result) =>{
-            res.status(200).json({
-                message: 'All product data...',
-                product_data: result
-            })
-        })
-    } catch (error) {
-        res.status(400).json({
-            message: error.message,
-        })
-    }
-})
+const multer = require("multer");
+const path = require("path");
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./public/image/");
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, Date.now() + file.originalname);
+  },
+});
 
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/jpeg" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/svg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 1024 * 1024 * 5,
+  },
+  fileFilter: fileFilter,
+});
+
+router.get("/", (req, res) => {
+  try {
+    Product.find()
+      // .populate('category_id')
+      // .populate('offer_id')
+      // .populate('client_id')
+      .then((result) => {
+        res.status(200).json({
+          message: "All product data...",
+          product_data: result,
+        });
+      });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+});
+
+router.post("/", upload.single("file"), (req, res) => {
+  // console.log('product image -->', file);
+  try {
+    const product_data = Product({
+      category: req.body.category,
+      offer: req.body.offer,
+      client: req.body.client,
+      title: req.body.title,
+      image: req.file.path,
+      description: req.body.description,
+      link: req.body.link,
+    });
+    product_data.save().then((result) => {
+      res.status(200).json({
+        message: "All product data...",
+        product_data: result,
+      });
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+});
+
+router.put("/:id", upload.single("file"), (req, res) => {
+  // console.log('product image -->', file);
+  try {
+    Product.findByIdAndUpdate(
+      { _id: req.params.id },
+      {
+        $set: {
+          category: req.body.category,
+          offer: req.body.offer,
+          client: req.body.client,
+          title: req.body.title,
+          image: req.file.path,
+          description: req.body.description,
+          link: req.body.link,
+        },
+      }
+    ).then((result) => {
+      res.status(200).json({
+        message: "All product data...",
+        product_data: result,
+      });
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+});
+
+router.delete("/:id", (req, res) => {
+  try {
+    Product.findOneAndRemove({ _id: req.params.id }).then((result) => {
+      res.status(200).json({
+        message: "Product is Deleted",
+        product_data: result,
+      });
+    });
+    console.log("delete data --->", delete_data);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+});
 
 module.exports = router;
