@@ -40,7 +40,7 @@ const upload = multer({
   fileFilter: fileFilter,
 });
 
-const multiple_upload = upload.fields([{ name: "image", maxCount: 2 }]);
+// const multiple_upload = upload.fields([{ name: "image", maxCount: 2 }]);
 
 router.get("/", (req, res) => {
   try {
@@ -61,7 +61,7 @@ router.get("/", (req, res) => {
   }
 });
 
-router.post("/", multiple_upload, (req, res) => {
+router.post("/", upload.single('file'), (req, res) => {
   // console.log("product image -->", req.files);
   try {
     const product_data = Product({
@@ -69,7 +69,7 @@ router.post("/", multiple_upload, (req, res) => {
       offer: req.body.offer,
       client: req.body.client,
       title: req.body.title,
-      image: req.files.image[0].filename,
+      image: req.file.filename,
       description: req.body.description,
       link: req.body.link,
     });
