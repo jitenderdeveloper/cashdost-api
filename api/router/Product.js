@@ -40,7 +40,7 @@ const upload = multer({
   fileFilter: fileFilter,
 });
 
-const multiple_upload = upload.fields([{ name: "image", maxCount: 1 }]);
+const multiple_upload = upload.fields([{ name: "image", maxCount: 2 }]);
 
 router.get("/", (req, res) => {
   try {
@@ -62,11 +62,8 @@ router.get("/", (req, res) => {
 });
 
 router.post("/", multiple_upload, (req, res) => {
-  console.log("product image -->", req.files);
+  // console.log("product image -->", req.files);
   try {
-    if (!req.files.image) {
-      return res.redirect("./public/image/");
-    }
     const product_data = Product({
       category: req.body.category,
       offer: req.body.offer,
@@ -84,7 +81,7 @@ router.post("/", multiple_upload, (req, res) => {
     });
   } catch (error) {
     res.status(400).json({
-      message: error.message,
+      message: `product api is not working ${error.message}`,
     });
   }
 });
