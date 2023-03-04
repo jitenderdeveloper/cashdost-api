@@ -117,16 +117,16 @@ router.put("/:id", upload.single("file"), (req, res) => {
 
 router.delete("/:id", (req, res) => {
   try {
-    Product.findOneAndRemove({ _id: req.params.id }).then((result) => {
+    Product.findByIdAndDelete({ _id: req.params.id }).then((result) => {
       res.status(200).json({
         message: "Product is Deleted",
         product_data: result,
       });
     });
-    console.log("delete data --->", delete_data);
+    // console.log("delete data --->", delete_data);
   } catch (error) {
     res.status(400).json({
-      message: error.message,
+      message: `product api ${error.message}`,
     });
   }
 });
