@@ -37,7 +37,6 @@ app.use(bodyParser.json());
 app.use(cors());
 
 //router connection----
-app.use("/public", express.static("public"));
 
 app.use("/api/user", UsersRouter);
 app.use("/api/product", ProductRouter);
@@ -46,6 +45,12 @@ app.use("/api/client", ClientRouter);
 app.use("/api/offer", OfferRouter);
 app.use("/api/coupon", CouponRouter);
 app.use("/api/todaydeals", TodayDealsRouter);
+
+
+
+app.use("/public/image", express.static("./public/image"));
+
+
 
 app.use((req, res) => {
   try {

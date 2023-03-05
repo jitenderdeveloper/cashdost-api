@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 const Product = require("../modules/ProductSchema");
 const authorization = require("../middleware/auth");
-const fs = require("fs");
+// const fs = require("fs");
+const multer = require("multer");
+const path = require("path");
 
 // ---multar-section---
 
-const multer = require("multer");
-const path = require("path");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -69,7 +69,7 @@ router.post("/", upload.single("file"), (req, res) => {
       offer: req.body.offer,
       client: req.body.client,
       title: req.body.title,
-      image: req.file.filename,
+      image: req.file.path,
       description: req.body.description,
       link: req.body.link,
     });
