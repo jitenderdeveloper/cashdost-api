@@ -61,7 +61,7 @@ router.get("/", (req, res) => {
   }
 });
 
-router.post("/", upload.single('file'), (req, res) => {
+router.post("/", upload.single("file"), (req, res) => {
   // console.log("product image -->", req.files);
   try {
     const product_data = Product({
